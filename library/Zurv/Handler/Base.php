@@ -1,7 +1,11 @@
 <?php
-use Zurv\View\View;
-use Zurv\View\Adapter\Factory as AdapterFactory;
-class BaseHandler extends ToroHandler {
+namespace Zurv\Handler;
+
+use \Zurv\Registry;
+use \Zurv\View\View;
+use \Zurv\View\Adapter\Factory as AdapterFactory;
+
+class Base extends \ToroHandler {
 	protected $_db = null;
 	
 	/**
@@ -15,7 +19,7 @@ class BaseHandler extends ToroHandler {
 	public function __construct() {
 		parent::__construct();
 
-		$this->_db = Zurv\Registry::getInstance()->db;
+		$this->_db = Registry::getInstance()->db;
 		
 		$adapter = null;
 		if(isset($this->_template)) {

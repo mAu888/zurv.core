@@ -1,5 +1,7 @@
 <?php
-class AppHandler extends BaseHandler {
+require_once 'library/Zurv/Handler/Base.php';
+
+class AppHandler extends \Zurv\Handler\Base {
 	protected $_template = 'index.php';
 	
 	public function get() {
