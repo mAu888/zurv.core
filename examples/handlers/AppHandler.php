@@ -1,5 +1,5 @@
 <?php
-require_once 'library/Zurv/Handler/Base.php';
+require_once ZURV_BASE_PATH . 'Zurv/Handler/Base.php';
 
 class AppHandler extends \Zurv\Handler\Base {
 	protected $_template = 'index.php';
