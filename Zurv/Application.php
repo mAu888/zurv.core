@@ -3,7 +3,8 @@ namespace Zurv;
 
 class Application {
 	protected $_options = array(
-		'library' => 'library/'
+		'library' => 'library/',
+		'bootstrapperClass' => ''
 	);
 	
 	public function __construct($options = array()) {
@@ -37,6 +38,29 @@ class Application {
 		});
 	}
 	
+	/**
+	 * Runs the configured bootstrapper 
+	 *
+	 * @return \Zurv\Application
+	 */
+	public function bootstrap() {
+		if(class_exists($this->_options['bootstrapperClass'])) {
+			$bootstrapper = new $this->_options['bootstrapperClass']($this);
+
+			if($bootstrapper instanceof Bootstrapper) {
+				$methods = get_class_methods($bootstrapper);
+
+				foreach($methods as $method) {
+					if(strpos($method, 'init') === 0) {
+						$bootstrapper->bootstrap($method);
+					}
+				}
+			}
+		}
+
+		return $this;
+	}
+
 	public function run($routes) {
 		$toro = new \ToroApplication($routes);
 		$toro->serve();
