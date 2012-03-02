@@ -3,7 +3,8 @@ namespace Zurv;
 
 class Application {
 	protected $_options = array(
-		'library' => 'library/',
+		'applicationPath' => '',
+		'libraryPath' => 'library/',
 		'bootstrapperClass' => ''
 	);
 	
@@ -66,13 +67,22 @@ class Application {
 		$toro->serve();
 	}
 	
+	/**
+	 * Returns the path to the application.
+	 *
+	 * @return string
+	 */
+	public function path() {
+		return realpath($this->_options['applicationPath']) . '/';
+	}
+
 	public function autoloader($class) {
 		if(strpos($class, '\\') !== false) {
 			$className = substr($class, strrpos($class, '\\') + 1);	
 		}
 		
 		$filePath = str_replace('\\', '/', $class);
-		$filePath = "{$this->_options['library']}/{$filePath}.php";
+		$filePath = "{$this->_options['libraryPath']}/{$filePath}.php";
 		if(file_exists($filePath)) {
 			require_once $filePath;
 		}else {echo "$filePath";}
