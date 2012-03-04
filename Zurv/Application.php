@@ -2,15 +2,36 @@
 namespace Zurv;
 
 class Application {
+	/**
+	 * Options for the application
+	 *
+	 * @var array
+	 */
 	protected $_options = array(
 		'applicationPath' => '',
 		'libraryPath' => 'library/',
 		'bootstrapperClass' => ''
 	);
+
+	/**
+	 * Single registry instance for the application
+	 *
+	 * @var \Zurv\Registry
+	 */
+	protected $_registry = null;
 	
 	public function __construct($options = array()) {
 		$this->_options = array_merge($this->_options, $options);
 		
+		if(isset($this->_options['registry'])) {
+			if($this->_options['registry'] instanceof Registry) {
+				$this->setRegistry($this->_options['registry']);
+			}
+			else if(class_exists($this->_options['registry'])) {
+				$this->setRegistry(new $this->_options['registry']);
+			}
+		}
+
 		/**
 		 * Register the autoloader function
 		 */
@@ -66,7 +87,7 @@ class Application {
 		$toro = new \ToroApplication($routes);
 		$toro->serve();
 	}
-	
+
 	/**
 	 * Returns the path to the application.
 	 *
@@ -76,6 +97,9 @@ class Application {
 		return realpath($this->_options['applicationPath']) . '/';
 	}
 
+	/**
+	 * The basic autoloader
+	 */
 	public function autoloader($class) {
 		if(strpos($class, '\\') !== false) {
 			$className = substr($class, strrpos($class, '\\') + 1);	
@@ -86,5 +110,27 @@ class Application {
 		if(file_exists($filePath)) {
 			require_once $filePath;
 		}else {echo "$filePath";}
+	}
+
+	/**
+	 * Return the registry instance for the application
+	 *
+	 * @return \Zurv\Registry
+	 */
+	public function getRegistry() {
+		if(is_null($this->_registry)) {
+			$this->_registry = new Registry();
+		}
+
+		return $this->_registry;
+	}
+
+	/** 
+	 * Set the registry instance for the application
+	 *
+	 * @param \Zurv\Registry
+	 */
+	public function setRegistry(Registry $r) {
+		$this->_registry = $r;
 	}
 }

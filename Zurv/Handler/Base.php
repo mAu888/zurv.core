@@ -23,8 +23,9 @@ class Base extends \ToroHandler {
 		
 		$adapter = null;
 		if(isset($this->_template)) {
-			$this->_template = strpos($this->_template, '.') !== false ?
-				"views/{$this->_template}" : "views/{$this->_template}.php";
+			// TODO: Get the base path from the application object
+			$this->_template = APP_BASE_PATH . (strpos($this->_template, '.') !== false ?
+				"views/{$this->_template}" : "views/{$this->_template}.php");
 			
 			$adapter = AdapterFactory::create(AdapterFactory::FILE, $this->_template);
 		}

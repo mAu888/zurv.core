@@ -9,7 +9,8 @@ require_once APP_BASE_PATH . 'config/config.php';
 require_once APP_BASE_PATH . 'handlers/AppHandler.php';
 $application = new \Zurv\Application(array(
 	'libraryPath' => ZURV_BASE_PATH,
-  'bootstrapperClass' => '\Zurv\Bootstrapper\Base'
+  'bootstrapperClass' => '\Zurv\Bootstrapper\Base',
+  'registry' => \Zurv\Registry::getInstance()
 ));
 
 $application->bootstrap()->run(array(
