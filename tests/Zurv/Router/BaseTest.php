@@ -31,13 +31,23 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
     );
 
     // Create mock for request
-    $requestMock = $this->getMock('\Zurv\Request', array('getPath'));
-    $requestMock->expects($this->once())
-                ->method('getPath')
-                ->will($this->returnValue('/'));
-
+    $requestMock = $this->_getRequestMockWithPath('/');
     $route = $this->_router->route($requestMock);
 
     $this->assertEquals(array('controller' => 'Index', 'action' => 'index'), $route);
+
+    $requestMock = $this->_getRequestMockWithPath('/bar');
+    $route = $this->_router->route($requestMock);
+
+    $this->assertEquals(array('controller' => 'Bar', 'action' => 'bar'), $route);
+  }
+
+  protected function _getRequestMockWithPath($path) {
+    $requestMock = $this->getMock('\Zurv\Request', array('getPath'));
+    $requestMock->expects($this->once())
+                ->method('getPath')
+                ->will($this->returnValue($path));
+
+    return $requestMock;
   }
 }
