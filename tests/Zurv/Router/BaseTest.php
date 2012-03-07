@@ -43,6 +43,28 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @test
+   */
+  function setAndProcessDynamicRoutes() {
+    $this->_router->addRoutes(
+      array(
+        '/(?P<controller>[a-z]+)/(?P<action>[a-z]+)' => array(),
+        '/foo/bar/:action' => array('controller' => 'Foo')
+      )
+    );
+
+    $requestMock = $this->_getRequestMockWithPath('/foo/bar');
+    $route = $this->_router->route($requestMock);
+
+    $this->assertEquals(array('controller' => 'Foo', 'action' => 'bar'), $route);
+
+    $requestMock = $this->_getRequestMockWithPath('/foo/bar/someAction');
+    $route = $this->_router->route($requestMock);
+
+    $this->assertEquals(array('controller' => 'Foo', 'action' => 'someAction'), $route);
+  }
+
+  /**
    * Creates a mock object for a \Zurv\Request class instance. The mock expects the getPath method to be called once.
    * @param string $path
    */

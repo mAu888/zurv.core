@@ -10,7 +10,7 @@ class Base implements Router {
    */
   protected $_routes = array();
 
-  public function addRoute($route, $controller, $action = 'index', $parameters = array()) {
+  public function addRoute($route, $controller = 'Index', $action = 'index', $parameters = array()) {
     $this->_routes[$route] = array(
       'controller' => $controller,
       'action' => $action
@@ -24,7 +24,12 @@ class Base implements Router {
         $action = $options['action'];
       }
 
-      $this->addRoute($route, $options['controller'], $action);
+      $controller = 'Index';
+      if(isset($options['controller']) && ! empty($options['controller'])) {
+        $controller = $options['controller'];
+      }
+
+      $this->addRoute($route, $controller, $action);
     }
   }
 
@@ -33,8 +38,18 @@ class Base implements Router {
 
     $matchedRoute = false;
     foreach($this->_routes as $route => $options) {
-      if(preg_match('/^' . preg_quote($route, '/') . '$/i', $path, $matches)) {
+      $route = str_replace(array('/', ':action', ':controller'), array('\/', '(?P<action>[a-z-_]+)', '(?P<action>[a-z-_]+)'), $route);
+
+      if(preg_match('/^' . $route . '$/i', $path, $matches)) {
         $matchedRoute = $options;
+
+        if(isset($matches['action'])) {
+          $matchedRoute['action'] = $matches['action'];
+        }
+
+        if(isset($matches['controller'])) {
+          $matchedRoute['controller'] = ucfirst($matches['controller']);
+        }
       }
     }
 
