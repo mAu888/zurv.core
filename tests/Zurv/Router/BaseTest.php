@@ -42,6 +42,10 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
     $this->assertEquals(array('controller' => 'Bar', 'action' => 'bar'), $route);
   }
 
+  /**
+   * Creates a mock object for a \Zurv\Request class instance. The mock expects the getPath method to be called once.
+   * @param string $path
+   */
   protected function _getRequestMockWithPath($path) {
     $requestMock = $this->getMock('\Zurv\Request', array('getPath'));
     $requestMock->expects($this->once())
