@@ -14,7 +14,30 @@ class HTTPTest extends \PHPUnit_Framework_TestCase {
   /**
    * @test
    */ 
-  public function requestIsSetUp() {
+  function requestIsSetUp() {
     $this->assertInstanceof('\Zurv\Request\HTTP', $this->_request);
+  }
+
+  /**
+   * @test
+   */
+  function getRequestMethods() {
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+
+    $this->assertEquals(HTTP::GET, $this->_request->getRequestMethod());
+    $this->assertTrue($this->_request->isGet());
+    $this->assertFalse($this->_request->isPost());
+  }
+
+  /**
+   * @test
+   */
+  function isAjaxRequest() {
+    $this->assertFalse($this->_request->isXmlHttpRequest());
+    $this->assertFalse($this->_request->isAjaxRequest());
+
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+    $this->assertTrue($this->_request->isXmlHttpRequest());
+    $this->assertTrue($this->_request->isAjaxRequest());
   }
 }
