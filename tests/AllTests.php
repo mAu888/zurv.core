@@ -7,6 +7,6 @@
 
 class AllTests {
   public static function suite() {
-    $suite = new PHPUnit_Framework_TestSuite('zurv.core');
+    #$suite = new PHPUnit_Framework_TestSuite('zurv.core');
   }
 }

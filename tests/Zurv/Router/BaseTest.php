@@ -31,12 +31,24 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
     );
 
     // Create mock for request
-    $requestMock = $this->_getRequestMockWithPath('/');
+    $requestMock = $this->_getRequestMockWithPath('/', array('setController', 'setAction'));
+    $requestMock->expects($this->once())
+                ->method('setController')
+                ->with('Index');
+    $requestMock->expects($this->once())
+                ->method('setAction')
+                ->with('index');
     $route = $this->_router->route($requestMock);
 
     $this->assertEquals(array('controller' => 'Index', 'action' => 'index'), $route);
 
-    $requestMock = $this->_getRequestMockWithPath('/bar');
+    $requestMock = $this->_getRequestMockWithPath('/bar', array('setController', 'setAction'));
+    $requestMock->expects($this->once())
+                ->method('setController')
+                ->with('Bar');
+    $requestMock->expects($this->once())
+                ->method('setAction')
+                ->with('bar');
     $route = $this->_router->route($requestMock);
 
     $this->assertEquals(array('controller' => 'Bar', 'action' => 'bar'), $route);
@@ -53,23 +65,93 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
       )
     );
 
-    $requestMock = $this->_getRequestMockWithPath('/foo/bar');
+    $requestMock = $this->_getRequestMockWithPath('/foo/bar', array('setController', 'setAction'));
+    $requestMock->expects($this->once())
+                ->method('setController')
+                ->with('Foo');
+    $requestMock->expects($this->once())
+                ->method('setAction')
+                ->with('bar');
     $route = $this->_router->route($requestMock);
 
     $this->assertEquals(array('controller' => 'Foo', 'action' => 'bar'), $route);
 
-    $requestMock = $this->_getRequestMockWithPath('/foo/bar/someAction');
+    $requestMock = $this->_getRequestMockWithPath('/foo/bar/someAction', array('setController', 'setAction'));
+    $requestMock->expects($this->once())
+                ->method('setController')
+                ->with('Foo');
+    $requestMock->expects($this->once())
+                ->method('setAction')
+                ->with('someAction');
     $route = $this->_router->route($requestMock);
 
     $this->assertEquals(array('controller' => 'Foo', 'action' => 'someAction'), $route);
   }
 
   /**
+   * @test
+   */
+  function inRouteDefinedParametersAreOverwrittenByRequestParameters() {
+    $this->_router->addRoute('/', 'Index', 'index', array('id' => 1));
+
+    $requestMock = $this->_getRequestMockWithPath('/', array('hasParameter', 'setParameter', 'setController', 'setAction'));
+    $requestMock->expects($this->once())
+                ->method('hasParameter')
+                ->with('id')
+                ->will($this->returnValue(false));
+    $requestMock->expects($this->once())
+                ->method('setParameter')
+                ->with('id', 1);
+    $requestMock->expects($this->once())
+                ->method('setController')
+                ->with('Index');
+    $requestMock->expects($this->once())
+                ->method('setAction')
+                ->with('index');
+    $route = $this->_router->route($requestMock);
+
+    $requestMock = $this->_getRequestMockWithPath('/', array('hasParameter', 'setController', 'setAction'));
+    $requestMock->expects($this->once())
+                ->method('hasParameter')
+                ->with('id')
+                ->will($this->returnValue(true));
+    $requestMock->expects($this->once())
+                ->method('setController')
+                ->with('Index');
+    $requestMock->expects($this->once())
+                ->method('setAction')
+                ->with('index');
+    $route = $this->_router->route($requestMock);
+  }
+
+  /**
+   * @test
+   */
+  function extensionInRouteIsSetInRequestObject() {
+    $this->_router->addRoute('/:controller', 'Index', 'index');
+
+    $requestMock = $this->_getRequestMockWithPath('/foo.json', array('setExtension', 'setController', 'setAction'));
+    $requestMock->expects($this->once())
+                ->method('setExtension')
+                ->with('json');
+    $requestMock->expects($this->once())
+                ->method('setController')
+                ->with('Foo');
+    $requestMock->expects($this->once())
+                ->method('setAction')
+                ->with('index');
+    $route = $this->_router->route($requestMock);
+
+    $this->assertEquals('Foo', $route['controller']);
+    $this->assertEquals('index', $route['action']);
+  }
+
+  /**
    * Creates a mock object for a \Zurv\Request class instance. The mock expects the getPath method to be called once.
    * @param string $path
    */
-  protected function _getRequestMockWithPath($path) {
-    $requestMock = $this->getMock('\Zurv\Request', array('getPath'));
+  protected function _getRequestMockWithPath($path, $additionalMethods = array()) {
+    $requestMock = $this->getMock('\Zurv\Request', array_merge(array('getPath'), $additionalMethods));
     $requestMock->expects($this->once())
                 ->method('getPath')
                 ->will($this->returnValue($path));

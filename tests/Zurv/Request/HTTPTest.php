@@ -8,6 +8,8 @@ class HTTPTest extends \PHPUnit_Framework_TestCase {
   protected $_request;
 
   public function setUp() {
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+
     $this->_request = new HTTP();
   }
 
@@ -23,10 +25,53 @@ class HTTPTest extends \PHPUnit_Framework_TestCase {
    */
   function getRequestMethods() {
     $_SERVER['REQUEST_METHOD'] = 'GET';
+    $request = new HTTP();
 
-    $this->assertEquals(HTTP::GET, $this->_request->getRequestMethod());
-    $this->assertTrue($this->_request->isGet());
-    $this->assertFalse($this->_request->isPost());
+    $this->assertEquals(HTTP::GET, $request->getRequestMethod());
+    $this->assertTrue($request->isGet());
+    $this->assertFalse($request->isPost());
+    $this->assertFalse($request->isPut());
+    $this->assertFalse($request->isDelete());
+
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    $request = new HTTP();
+
+    $this->assertEquals(HTTP::POST, $request->getRequestMethod());
+    $this->assertTrue($request->isPost());
+    $this->assertFalse($request->isGet());
+    $this->assertFalse($request->isPut());
+    $this->assertFalse($request->isDelete());
+
+    $_SERVER['REQUEST_METHOD'] = 'PUT';
+    $request = new HTTP();
+
+    $this->assertEquals(HTTP::PUT, $request->getRequestMethod());
+    $this->assertTrue($request->isPut());
+    $this->assertFalse($request->isGet());
+    $this->assertFalse($request->isPost());
+    $this->assertFalse($request->isDelete());
+
+    $_SERVER['REQUEST_METHOD'] = 'DELETE';
+    $request = new HTTP();
+
+    $this->assertEquals(HTTP::DELETE, $request->getRequestMethod());
+    $this->assertTrue($request->isDelete());
+    $this->assertFalse($request->isGet());
+    $this->assertFalse($request->isPost());
+    $this->assertFalse($request->isPut());
+  }
+
+  /**
+   * @test
+   */
+  function getParameterFromCurrentRequestTypeOverwritesOthers() {
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_GET['id'] = 1;
+    $_POST['id'] = 3;
+
+    $request = new HTTP();
+
+    $this->assertEquals(1, $request->getParameter('id'));
   }
 
   /**
