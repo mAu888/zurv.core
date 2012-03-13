@@ -9,7 +9,10 @@ class HTTP implements Request {
   const PUT = 'put';
   const DELETE = 'delete';
 
+  protected $_controller = '';
+  protected $_action = '';
   protected $_parameters = array();
+  protected $_extension = '';
 
   public function __construct() {
     if($this->isPut() || $this->isDelete()) {
@@ -25,6 +28,13 @@ class HTTP implements Request {
     else {
       $this->_parameters = array_merge($_GET, $_POST, $this->_parameters);
     }
+
+    // Set request extension
+    $this->_extension = pathinfo($this->getPath(), PATHINFO_EXTENSION);
+
+    // Handle initial controller and action
+    $this->_controller = $this->getParameter('controller');
+    $this->_action = $this->getParameter('action');
   }
 
   public function getRequestMethod() {
@@ -49,6 +59,44 @@ class HTTP implements Request {
 
   public function getParameter($name) {
     return isset($this->_parameters[$name]) ? $this->_parameters[$name] : null;
+  }
+
+  public function getExtension() {
+    return $this->_extension;
+  }
+
+  public function getPath() {
+    if(isset($_SERVER['PATH_INFO'])) {
+      return $_SERVER['PATH_INFO'];
+    }
+    else if(isset($_SERVER['REQUEST_URI'])) {
+      $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+      $path = str_replace($_SERVER['SCRIPT_NAME'], '', $path);
+
+      return substr($path, 0, 1) === '/' ? $path : "/{$path}";
+    }
+    else {
+      $path = parse_url($_SERVER['PHP_SELF'], PHP_URL_PATH);
+      $path = str_replace($_SERVER['SCRIPT_NAME'], '', $path);
+
+      return substr($path, 0, 1) === '/' ? $path : "/{$path}";
+    }
+  }
+
+  public function setController($controller) {
+    $this->_controller = $controller;
+  }
+
+  public function getController() {
+    return $this->_controller;
+  }
+
+  public function setAction($action) {
+    $this->_action = $action;
+  }
+
+  public function getAction() {
+    return $this->_action;
   }
 
   public function isXmlHttpRequest() {

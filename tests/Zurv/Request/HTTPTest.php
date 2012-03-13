@@ -9,6 +9,7 @@ class HTTPTest extends \PHPUnit_Framework_TestCase {
 
   public function setUp() {
     $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SERVER['PATH_INFO'] = '';
 
     $this->_request = new HTTP();
   }
@@ -84,5 +85,66 @@ class HTTPTest extends \PHPUnit_Framework_TestCase {
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     $this->assertTrue($this->_request->isXmlHttpRequest());
     $this->assertTrue($this->_request->isAjaxRequest());
+  }
+
+  /**
+   * @test
+   */
+  function getPathForCurrentRequest() {
+    $_SERVER['PATH_INFO'] = '/foo/bar';
+
+    $request = new HTTP();
+    $this->assertEquals('/foo/bar', $request->getPath());
+
+    $_SERVER = array();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SERVER['REQUEST_URI'] = 'foo/index.php/foo/bar?id=1';
+    $_SERVER['SCRIPT_NAME'] = 'foo/index.php/';
+
+    $request = new HTTP();
+    $this->assertEquals('/foo/bar', $request->getPath());
+
+    $_SERVER = array();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SERVER['REQUEST_URI'] = 'foo/index.php/foo/bar?id=1';
+    $_SERVER['SCRIPT_NAME'] = 'foo/index.php';
+
+    $request = new HTTP();
+    $this->assertEquals('/foo/bar', $request->getPath());
+
+    $_SERVER = array();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SERVER['PHP_SELF'] = 'foo/index.php/foo/bar?id=1';
+    $_SERVER['SCRIPT_NAME'] = 'foo/index.php/';
+
+    $request = new HTTP();
+    $this->assertEquals('/foo/bar', $request->getPath());
+  }
+
+  /**
+   * @test
+   */
+  function extensionIsInitiallySetFromRequestUrl() {
+    $_SERVER['PATH_INFO'] = '/foo/bar.json';
+
+    $request = new HTTP();
+    $this->assertEquals('json', $request->getExtension());
+  }
+
+  /**
+   * @test
+   */
+  function setAndGetControllerAndActionForRequest() {
+    $_GET['controller'] = 'index';
+    $_GET['action'] = 'index';
+    
+    $request = new HTTP();
+    $this->assertEquals('index', $request->getController());
+    $this->assertEquals('index', $request->getAction());
+
+    $request->setController('Foo');
+    $request->setAction('bar');
+    $this->assertEquals('Foo', $request->getController());
+    $this->assertEquals('bar', $request->getAction());
   }
 }
