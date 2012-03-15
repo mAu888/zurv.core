@@ -8,7 +8,7 @@ class Dispatcher {
   public function dispatch(Request $request, Response $response) {
     $controller = $this->_formatController($request->getController());
     $action = $this->_formatAction($request->getAction());
-
+    
     if(! class_exists($controller)) {
       throw new \Exception("{$request->getController()} is not dispatchable");
     }

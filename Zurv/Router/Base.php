@@ -11,11 +11,11 @@ class Base implements Router {
   protected $_routes = array();
 
   public function addRoute($route, $controller = 'Index', $action = 'index', $parameters = array()) {
-    $this->_routes[$route] = array(
-      'controller' => $controller,
-      'action' => $action,
-      'parameters' => $parameters
-    );
+    $route = new Route($route, $controller, $action, $parameters);
+    
+    array_push($this->_routes, $route);
+
+    return $route;
   }
 
   public function addRoutes($routes) {
@@ -45,33 +45,38 @@ class Base implements Router {
     }
 
     $matchedRoute = false;
-    foreach($this->_routes as $route => $options) {
-      $route = str_replace(array('/', ':action', ':controller'), array('\/', '(?P<action>[a-z-_]+)', '(?P<controller>[a-z-_]+)'), $route);
+    foreach($this->_routes as $route) {
+      // Route does not respond to current request method
+      if(! $route->responds($request->getRequestMethod())) {
+        continue;
+      }
 
-      if(preg_match('/^' . $route . '$/i', $path, $matches)) {
-        $matchedRoute = $options;
+      $routePattern = str_replace(array('/', ':action', ':controller'), array('\/', '(?P<action>[a-z-_]+)', '(?P<controller>[a-z-_]+)'), $route->getRoute());
 
+      if(preg_match('/^' . $routePattern . '$/i', $path, $matches)) {
+        $matchedRoute = $route;
         if(isset($matches['action'])) {
-          $matchedRoute['action'] = $matches['action'];
+          $route->setAction($matches['action']);
         }
 
         if(isset($matches['controller'])) {
-          $matchedRoute['controller'] = ucfirst($matches['controller']);
+          $route->setController(ucfirst($matches['controller']));
         }
+
+        break;
       }
     }
 
     if($matchedRoute) {
-      foreach($matchedRoute['parameters'] as $name => $value) {
+      foreach($matchedRoute->getParameters() as $name => $value) {
         if(! $request->hasParameter($name)) {
           $request->setParameter($name, $value);
         }
       }
-      unset($matchedRoute['parameters']);
 
       // Set the found controller and action to the request object
-      $request->setController($matchedRoute['controller']);
-      $request->setAction($matchedRoute['action']);
+      $request->setController($matchedRoute->getController());
+      $request->setAction($matchedRoute->getAction());
     }
 
     return $matchedRoute;

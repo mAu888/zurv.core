@@ -1,18 +1,30 @@
 <?php
-define('ZURV_BASE_PATH', realpath('./../../') . '/');
-define('APP_BASE_PATH', realpath('./../') . '/');
+header('Content-Type: text/plain');
 
-require_once ZURV_BASE_PATH . 'Submodules/torophp/toro.php';
-require_once ZURV_BASE_PATH . 'Zurv/Application.php';
-require_once APP_BASE_PATH . 'config/config.php';
+spl_autoload_register(function($class) {
+  $class = str_replace('\\', '/', $class);
 
-require_once APP_BASE_PATH . 'handlers/AppHandler.php';
-$application = new \Zurv\Application(array(
-	'libraryPath' => ZURV_BASE_PATH,
-  'bootstrapperClass' => '\Zurv\Bootstrapper\Base',
-  'registry' => \Zurv\Registry::getInstance()
-));
+  if(file_exists('../../' . $class . '.php')) {
+    require_once '../../' . $class . '.php';
+  }
+  else if(file_exists('../controllers/' . $class . '.php')) {
+    require_once '../controllers/' . $class . '.php';
+  }
+});
 
-$application->bootstrap()->run(array(
-	array('/', 'AppHandler')
-));
+// Set up request and response
+$request = new \Zurv\Request\HTTP();
+$response = new \Zurv\Response\HTTP();
+
+$router = new \Zurv\Router\Base;
+$route = $router->addRoute('/', 'Index', 'index');
+$route->forGetRequest(true);
+
+$route = $router->addRoute('/:controller(/:action)?');
+
+$route = $router->route($request);
+
+$dispatcher = new \Zurv\Dispatcher();
+$dispatcher->dispatch($request, $response);
+
+echo $response->getBody();

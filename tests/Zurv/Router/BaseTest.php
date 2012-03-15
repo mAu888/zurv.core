@@ -3,6 +3,7 @@ namespace Zurv\Router;
 
 require_once '../Zurv/Router.php';
 require_once '../Zurv/Router/Base.php';
+require_once '../Zurv/Router/Route.php';
 
 class BaseTest extends \PHPUnit_Framework_TestCase {
   protected $_router;
@@ -34,12 +35,14 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
     $requestMock = $this->_getRequestMockWithPathControllerAction('/', 'Index', 'index');
     $route = $this->_router->route($requestMock);
 
-    $this->assertEquals(array('controller' => 'Index', 'action' => 'index'), $route);
+    $this->assertEquals('Index', $route->getController());
+    $this->assertEquals('index', $route->getAction());
 
     $requestMock = $this->_getRequestMockWithPathControllerAction('/bar', 'Bar', 'bar');
     $route = $this->_router->route($requestMock);
 
-    $this->assertEquals(array('controller' => 'Bar', 'action' => 'bar'), $route);
+    $this->assertEquals('Bar', $route->getController());
+    $this->assertEquals('bar', $route->getAction());
   }
 
   /**
@@ -56,12 +59,14 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
     $requestMock = $this->_getRequestMockWithPathControllerAction('/foo/bar', 'Foo', 'bar');
     $route = $this->_router->route($requestMock);
 
-    $this->assertEquals(array('controller' => 'Foo', 'action' => 'bar'), $route);
+    $this->assertEquals('Foo', $route->getController());
+    $this->assertEquals('bar', $route->getAction());
 
     $requestMock = $this->_getRequestMockWithPathControllerAction('/foo/bar/someAction', 'Foo', 'someAction');
     $route = $this->_router->route($requestMock);
 
-    $this->assertEquals(array('controller' => 'Foo', 'action' => 'someAction'), $route);
+    $this->assertEquals('Foo', $route->getController());
+    $this->assertEquals('someAction', $route->getAction());
   }
 
   /**
@@ -100,8 +105,28 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
                 ->with('json');
     $route = $this->_router->route($requestMock);
 
-    $this->assertEquals('Foo', $route['controller']);
-    $this->assertEquals('index', $route['action']);
+    $this->assertEquals('Foo', $route->getController());
+    $this->assertEquals('index', $route->getAction());
+  }
+
+  /**
+   * @test
+   */
+  function requestTypeAwareRouteOnlyRespondsToGivenType() {
+    $route = $this->_router->addRoute('/', 'Index', 'index');
+    $route->forGetRequest(false);
+
+    $requestMock = $this->getMock('\Zurv\Request', array('getPath', 'getRequestMethod'));
+    $requestMock->expects($this->once())
+                ->method('getPath')
+                ->will($this->returnValue('/'));
+    $requestMock->expects($this->once())
+                ->method('getRequestMethod')
+                ->will($this->returnValue('get'));
+
+    $route = $this->_router->route($requestMock);
+
+    $this->assertFalse($route);
   }
 
   /**
@@ -110,9 +135,12 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
    * @param string $controller
    * @param string $action
    */
-  protected function _getRequestMockWithPathControllerAction($path, $controller, $action, $additionalMethods = array()) {
-    $requestMock = $this->getMock('\Zurv\Request', array_merge(array('getPath', 'setController', 'setAction'), $additionalMethods));
+  protected function _getRequestMockWithPathControllerAction($path, $controller, $action, $additionalMethods = array(), $requestMethod = 'get') {
+    $requestMock = $this->getMock('\Zurv\Request', array_merge(array('getPath', 'getRequestMethod', 'setController', 'setAction'), $additionalMethods));
 
+    $requestMock->expects($this->any())
+                ->method('getRequestMethod')
+                ->will($this->returnValue($requestMethod));
     $requestMock->expects($this->once())
                 ->method('getPath')
                 ->will($this->returnValue($path));

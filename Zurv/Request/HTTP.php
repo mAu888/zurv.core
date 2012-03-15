@@ -38,27 +38,39 @@ class HTTP implements Request {
   }
 
   public function getRequestMethod() {
-    return strtolower($_SERVER['REQUEST_METHOD']);
+    $method = null;
+    switch(strtolower($_SERVER['REQUEST_METHOD'])) {
+      case 'get': $method = self::GET; break;
+      case 'post': $method = self::POST; break;
+      case 'put': $method = self::PUT; break;
+      case 'delete': $method = self::DELETE; break;
+      default: throw new Exception('Invalid request method'); break;
+    }
+    return $method;
   }
 
   public function isGet() {
-    return strtolower($_SERVER['REQUEST_METHOD']) === self::GET;
+    return strtolower($_SERVER['REQUEST_METHOD']) === 'get';
   }
 
   public function isPost() {
-    return strtolower($_SERVER['REQUEST_METHOD']) === self::POST;
+    return strtolower($_SERVER['REQUEST_METHOD']) === 'post';
   }
 
   public function isPut() {
-    return strtolower($_SERVER['REQUEST_METHOD']) === self::PUT;
+    return strtolower($_SERVER['REQUEST_METHOD']) === 'put';
   }
 
   public function isDelete() {
-    return strtolower($_SERVER['REQUEST_METHOD']) === self::DELETE;
+    return strtolower($_SERVER['REQUEST_METHOD']) === 'delete';
   }
 
   public function getParameter($name) {
     return isset($this->_parameters[$name]) ? $this->_parameters[$name] : null;
+  }
+
+  public function setParameter($name, $value) {
+    $this->_parameters[$name] = $value;
   }
 
   public function getExtension() {
