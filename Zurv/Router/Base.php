@@ -55,11 +55,11 @@ class Base implements Router {
 
       if(preg_match('/^' . $routePattern . '$/i', $path, $matches)) {
         $matchedRoute = $route;
-        if(isset($matches['action'])) {
+        if(isset($matches['action']) && ! empty($matches['action'])) {
           $route->setAction($matches['action']);
         }
 
-        if(isset($matches['controller'])) {
+        if(isset($matches['controller']) && ! empty($matches['controller'])) {
           $route->setController(ucfirst($matches['controller']));
         }
 

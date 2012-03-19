@@ -11,20 +11,10 @@ spl_autoload_register(function($class) {
     require_once '../controllers/' . $class . '.php';
   }
 });
-
-// Set up request and response
-$request = new \Zurv\Request\HTTP();
-$response = new \Zurv\Response\HTTP();
-
-$router = new \Zurv\Router\Base;
-$route = $router->addRoute('/', 'Index', 'index');
-$route->forGetRequest(true);
-
-$route = $router->addRoute('/:controller(/:action)?');
-
-$route = $router->route($request);
-
-$dispatcher = new \Zurv\Dispatcher();
-$dispatcher->dispatch($request, $response);
-
-echo $response->getBody();
+require_once '../Bootstrap.php';
+$app = new \Zurv\Application(
+  array(
+    'bootstrapperClass' => '\Application\Bootstrap'
+  )
+);
+$app->bootstrap()->run();

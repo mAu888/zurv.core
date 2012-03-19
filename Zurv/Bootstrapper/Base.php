@@ -6,8 +6,7 @@ use \Zurv\Bootstrapper;
 
 class Base implements Bootstrapper {
   protected $_application;
-
-
+  protected $_bootstrapped = array();
 
   public function __construct(Application $application) {
     $this->_application = $application;
@@ -23,7 +22,7 @@ class Base implements Bootstrapper {
       return;
     }
 
-    $this->{$methodOrSection}();
+    $this->{$methodOrSection}($this->_application);
 
     array_push($this->_bootstrapped, $methodOrSection);
   }

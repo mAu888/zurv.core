@@ -13,4 +13,8 @@ class HTTP implements Response {
   public function setBody($body) {
     $this->_body = $body;
   }
+
+  public function flush() {
+    echo $this->_body;
+  }
 }
