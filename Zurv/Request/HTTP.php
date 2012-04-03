@@ -65,12 +65,20 @@ class HTTP implements Request {
     return strtolower($_SERVER['REQUEST_METHOD']) === 'delete';
   }
 
+  public function hasParameter($name) {
+    return array_key_exists($ame, $this>_parameters);
+  }
+
   public function getParameter($name) {
     return isset($this->_parameters[$name]) ? $this->_parameters[$name] : null;
   }
 
   public function setParameter($name, $value) {
     $this->_parameters[$name] = $value;
+  }
+
+  public function setExtension($extension) {
+    $this->_extension = $extension;
   }
 
   public function getExtension() {

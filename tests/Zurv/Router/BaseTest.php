@@ -1,6 +1,7 @@
 <?php
 namespace Zurv\Router;
 
+require_once '../Zurv/Request.php';
 require_once '../Zurv/Router.php';
 require_once '../Zurv/Router/Base.php';
 require_once '../Zurv/Router/Route.php';
@@ -116,7 +117,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
     $route = $this->_router->addRoute('/', 'Index', 'index');
     $route->forGetRequest(false);
 
-    $requestMock = $this->getMock('\Zurv\Request', array('getPath', 'getRequestMethod'));
+    $requestMock = $this->getMockForAbstractClass('\Zurv\Request');
     $requestMock->expects($this->once())
                 ->method('getPath')
                 ->will($this->returnValue('/'));
@@ -136,7 +137,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
    * @param string $action
    */
   protected function _getRequestMockWithPathControllerAction($path, $controller, $action, $additionalMethods = array(), $requestMethod = 'get') {
-    $requestMock = $this->getMock('\Zurv\Request', array_merge(array('getPath', 'getRequestMethod', 'setController', 'setAction'), $additionalMethods));
+    $requestMock = $this->getMockForAbstractClass('\Zurv\Request');
 
     $requestMock->expects($this->any())
                 ->method('getRequestMethod')
