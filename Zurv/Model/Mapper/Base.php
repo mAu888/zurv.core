@@ -9,6 +9,15 @@ use Zurv\Model\Mapper as Mapper;
  * @author mau
  */
 abstract class Base implements Mapper {
+  /**
+   * @var \PDO
+   */
+  protected $_db;
+
+  public function __construct(\PDO $db) {
+    $this->_db = $db;
+  }
+
 	public function findById($id) {
 		throw new Exception('To be implemented');
 	}

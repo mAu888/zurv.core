@@ -23,14 +23,16 @@ class Base implements Router {
       $action = 'index';
       if(isset($options['action']) && ! empty($options['action'])) {
         $action = $options['action'];
+        unset($options['action']);
       }
 
       $controller = 'Index';
       if(isset($options['controller']) && ! empty($options['controller'])) {
         $controller = $options['controller'];
+        unset($options['controller']);
       }
 
-      $this->addRoute($route, $controller, $action);
+      $this->addRoute($route, $controller, $action, $options);
     }
   }
 

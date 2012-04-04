@@ -10,7 +10,7 @@ use \Zurv\Response;
  * 
  * @author mau
  */
-class FileView implements Adapter {
+class FileView extends Base {
   protected $_template = '';
   
   public function __construct($file) {

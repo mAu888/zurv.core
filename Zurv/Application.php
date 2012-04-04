@@ -24,8 +24,10 @@ class Application {
   protected $_request = null;
   protected $_response = null;
   protected $_router = null;
+
+  static protected $_instance = null;
   
-  public function __construct($options = array()) {
+  protected function __construct($options = array()) {
     $this->_options = array_merge($this->_options, $options);
     
     if(isset($this->_options['registry'])) {
@@ -43,6 +45,22 @@ class Application {
     spl_autoload_register(array($this, 'autoloader'), true);
   }
   
+  /**
+   * The singleton
+   */
+  static public function getInstance() {
+    if(is_null(static::$_instance)) {
+      $args = func_get_arg(0);
+      if(! is_array($args)) {
+        $args = array();
+      }
+
+      static::$_instance = new self($args);
+    }
+
+    return static::$_instance;
+  }
+
   /**
    * Runs the configured bootstrapper 
    *
@@ -69,6 +87,9 @@ class Application {
   public function run() {
     $request = $this->getRequest();
     $response = $this->getResponse();
+
+    // Bootstrap the application
+    $this->bootstrap();
 
     $this->getRouter()->route($this->getRequest());
     $this->getDispatcher()->dispatch($request, $response);
@@ -119,6 +140,24 @@ class Application {
   }
 
   /**
+   * Returns the application path
+   *
+   * @return string
+   */
+  public function getPath() {
+    return $this->_options['applicationPath'];
+  }
+
+/**
+   * Returns the library path
+   *
+   * @return string
+   */
+  public function getLibraryPath() {
+    return $this->_options['libraryPath'];
+  }
+
+  /**
    * The basic autoloader
    */
   public function autoloader($class) {
@@ -127,7 +166,7 @@ class Application {
     }
     
     $filePath = str_replace('\\', '/', $class);
-    $filePath = "{$this->_options['libraryPath']}{$filePath}.php";
+    $filePath = "{$this->getLibraryPath()}{$filePath}.php";
     if(file_exists($filePath)) {
       require_once $filePath;
     }
@@ -140,7 +179,7 @@ class Application {
    */
   public function getRegistry() {
     if(is_null($this->_registry)) {
-      $this->_registry = new Registry();
+      $this->_registry = Registry::getInstance();
     }
 
     return $this->_registry;

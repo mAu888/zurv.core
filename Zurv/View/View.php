@@ -32,7 +32,7 @@ class View {
 		$this->_vars[$key] = $value;
 	}
 	
-	public function render($vars = array()) {
+	public function render(array $vars = array()) {
 		$vars = array_merge($this->_vars, $vars);
 		
 		$render = $this->_viewAdapter->render($vars);

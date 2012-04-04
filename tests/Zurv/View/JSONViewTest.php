@@ -6,6 +6,7 @@ use Zurv\View\Adapter\Factory as AdapterFactory;
 
 require_once '../Zurv/View/View.php';
 require_once '../Zurv/View/Adapter.php';
+require_once '../Zurv/View/Adapter/Base.php';
 require_once '../Zurv/View/Adapter/JSONView.php';
 require_once '../Zurv/View/Adapter/Factory.php';
 

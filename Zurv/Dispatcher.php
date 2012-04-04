@@ -13,7 +13,7 @@ class Dispatcher {
       throw new \Exception("{$request->getController()} is not dispatchable");
     }
 
-    $controller = new $controller($request, $response);
+    $controller = new $controller();
 
     if(! method_exists($controller, $action)) {
       throw new \Exception("{$request->getAction()} is not dispatchable");
