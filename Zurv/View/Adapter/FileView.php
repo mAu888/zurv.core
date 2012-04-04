@@ -1,7 +1,9 @@
 <?php
 namespace Zurv\View\Adapter;
 
-use \Zurv\View\Adapter as Adapter;
+use \Zurv\View\Adapter;
+use \Zurv\Request;
+use \Zurv\Response;
 
 /**
  * ViewAdapter for file templates
@@ -19,7 +21,7 @@ class FileView implements Adapter {
 		$this->_template = $file;
 	}
 	
-	public function render(array $vars) {
+	public function render(array $vars, Request $request, Response $response) {
 		header('Content-Type: text/html; charset="utf8"');
 		
 		ob_start();
