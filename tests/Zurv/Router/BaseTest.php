@@ -131,6 +131,26 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @test
+   */
+  function dynamicParametersDefinedInRouteAreTransferredIntoRequestObject() {
+    $route = $this->_router->addRoute('/(?P<id>[1-9][0-9]*)', 'Index', 'index');
+
+    $requestMock = $this->getMockForAbstractClass('\Zurv\Request');
+    $requestMock->expects($this->once())
+                ->method('getPath')
+                ->will($this->returnValue('/1'));
+    $requestMock->expects($this->once())
+                ->method('getRequestMethod')
+                ->will($this->returnValue('get'));
+    $requestMock->expects($this->once())
+                ->method('setParameter')
+                ->with('id', '1');
+
+    $route = $this->_router->route($requestMock);
+  }
+
+  /**
    * Creates a mock object for a \Zurv\Request class instance.
    * @param string $path
    * @param string $controller

@@ -1,8 +1,8 @@
 <phpunit>
-   <testsuite name="Test Suite">
+  <testsuite name="Test Suite">
       <directory>./</directory>
-   </testsuite>
-   <php>
-    <includePath>/Users/mau/Sites/zurv.core/tests/_files:/Users/mau/Sites/zurv.core</includePath>
-   </php>
+  </testsuite>
+  <php>
+    <includePath>_files:..</includePath>
+  </php>
 </phpunit>

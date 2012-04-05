@@ -59,26 +59,33 @@ class Base implements Router {
         $matchedRoute = $route;
         if(isset($matches['action']) && ! empty($matches['action'])) {
           $route->setAction($matches['action']);
+          unset($matches['action']);
         }
 
         if(isset($matches['controller']) && ! empty($matches['controller'])) {
           $route->setController(ucfirst($matches['controller']));
+          unset($matches['controller']);
+        }
+
+        // Set the routes default parameters
+        foreach($matchedRoute->getParameters() as $name => $value) {
+          if(! $request->hasParameter($name)) {
+            $request->setParameter($name, $value);
+          }
+        }
+
+        // Set the found controller and action to the request object
+        $request->setController($matchedRoute->getController());
+        $request->setAction($matchedRoute->getAction());
+
+        foreach($matches as $key => $value) {
+          if(is_string($key)) {
+            $request->setParameter($key, $value);
+          }
         }
 
         break;
       }
-    }
-
-    if($matchedRoute) {
-      foreach($matchedRoute->getParameters() as $name => $value) {
-        if(! $request->hasParameter($name)) {
-          $request->setParameter($name, $value);
-        }
-      }
-
-      // Set the found controller and action to the request object
-      $request->setController($matchedRoute->getController());
-      $request->setAction($matchedRoute->getAction());
     }
 
     return $matchedRoute;
