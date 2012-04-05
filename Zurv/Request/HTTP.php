@@ -66,7 +66,7 @@ class HTTP implements Request {
   }
 
   public function hasParameter($name) {
-    return array_key_exists($ame, $this>_parameters);
+    return array_key_exists($name, $this->_parameters);
   }
 
   public function getParameter($name) {
