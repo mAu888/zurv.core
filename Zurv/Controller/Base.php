@@ -111,7 +111,8 @@ class Base implements Controller {
       }
 
       $adapter = AdapterFactory::create(AdapterFactory::FILE, $file);
-      $this->_view = new View($adapter);
     }
+
+    $this->_view = new View($adapter);
   }
 }
