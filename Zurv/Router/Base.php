@@ -53,6 +53,11 @@ class Base implements Router {
         continue;
       }
 
+      // Route requires request to be ajax
+      if($route->getRequireXmlHttpRequest() && ! $request->isXmlHttpRequest()) {
+        continue;
+      }
+
       $routePattern = str_replace(array('/', ':action', ':controller'), array('\/', '(?P<action>[a-z-_]+)', '(?P<controller>[a-z-_]+)'), $route->getRoute());
 
       if(preg_match('/^' . $routePattern . '$/i', $path, $matches)) {

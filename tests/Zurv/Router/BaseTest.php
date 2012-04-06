@@ -151,6 +151,45 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @test
+   */
+  function requiringRequestToBeAjaxExpectsRouterToFailOnNormalRequest() {
+    $route = $this->_router->addRoute('/', 'Index', 'index');
+    $route->setRequireXmlHttpRequest(true);
+
+    $requestMock = $this->getMockForAbstractClass('\Zurv\Request');
+    $requestMock->expects($this->once())
+                ->method('getPath')
+                ->will($this->returnValue('/'));
+
+    $route = $this->_router->route($requestMock);
+    $this->assertFalse($route);
+  }
+
+  /**
+   * @test
+   */
+  function requiringRequestToBeAjaxExpectsRouterToSuccessOnAjaxRequest() {
+    $route = $this->_router->addRoute('/', 'Index', 'index');
+    $route->setRequireXmlHttpRequest(true);
+
+    $requestMock = $this->getMockForAbstractClass('\Zurv\Request');
+    $requestMock->expects($this->once())
+                ->method('getPath')
+                ->will($this->returnValue('/'));
+    $requestMock->expects($this->any())
+                ->method('getRequestMethod')
+                ->will($this->returnValue('get'));
+    $requestMock->expects($this->once())
+                ->method('isXmlHttpRequest')
+                ->will($this->returnValue(true));
+
+    $route = $this->_router->route($requestMock);
+    $this->assertEquals('Index', $route->getController());
+    $this->assertEquals('index', $route->getAction());
+  }
+
+  /**
    * Creates a mock object for a \Zurv\Request class instance.
    * @param string $path
    * @param string $controller

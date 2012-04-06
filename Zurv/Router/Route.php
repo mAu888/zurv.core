@@ -12,6 +12,8 @@ class Route {
   protected $_put = true;
   protected $_delete = true;
 
+  protected $_requireAjax = false;
+
   public function __construct($route, $controller, $action, $parameters = array()) {
     $this->_route = $route;
     $this->_controller = $controller;
@@ -53,6 +55,14 @@ class Route {
       case 'delete': return $this->_delete; break;
       default: return false; break;
     }
+  }
+
+  public function setRequireXmlHttpRequest($require) {
+    $this->_requireAjax = (bool)$require;
+  }
+
+  public function getRequireXmlHttpRequest() {
+    return $this->_requireAjax;
   }
 
   public function forGetRequest($responds = true) {

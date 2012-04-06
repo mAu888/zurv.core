@@ -15,4 +15,6 @@ interface Request {
   public function setController($controller);
   public function setParameter($parameter, $value);
   public function setExtension($extension);
+
+  public function isXmlHttpRequest();
 }
