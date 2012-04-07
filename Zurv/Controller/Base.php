@@ -40,6 +40,14 @@ class Base implements Controller {
   protected $_viewsPath = 'views/';
 
   /**
+   * If the view adapter should be loaded based on the extension or specific
+   * headers send in the request or not.
+   *
+   * @var bool
+   */
+  protected $_detectViewAdapter = true;
+
+  /**
    * If this member variable is overwritten, this file will be used as the
    * template instead of auto picking.
    *
@@ -96,7 +104,7 @@ class Base implements Controller {
    */
   protected function _initView() {
     $adapter = null;
-    if($this->getRequest()->isAjaxRequest()) {
+    if($this->_detectViewAdapter && $this->getRequest()->isAjaxRequest()) {
       $adapter = AdapterFactory::create(AdapterFactory::JSON);
     }
     else {

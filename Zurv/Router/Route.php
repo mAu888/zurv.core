@@ -2,6 +2,11 @@
 namespace Zurv\Router;
 
 class Route {
+  const GET = 'get';
+  const POST = 'post';
+  const PUT = 'put';
+  const DELETE = 'delete';
+
   protected $_route = '';
   protected $_controller = 'Index';
   protected $_action = 'index';
@@ -63,6 +68,25 @@ class Route {
 
   public function getRequireXmlHttpRequest() {
     return $this->_requireAjax;
+  }
+
+  public function setRequestTypes() {
+    $args = func_get_args();
+
+    $this->forGetRequest(false);
+    $this->forPostRequest(false);
+    $this->forPutRequest(false);
+    $this->forDeleteRequest(false);
+
+    foreach($args as $arg) {
+      switch($arg) {
+        case self::GET: $this->forGetRequest(true); break;
+        case self::POST: $this->forPostRequest(true); break;
+        case self::PUT: $this->forPutRequest(true); break;
+        case self::DELETE: $this->forDeleteRequest(true); break;
+        default: break;
+      }
+    }
   }
 
   public function forGetRequest($responds = true) {
