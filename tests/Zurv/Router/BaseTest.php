@@ -213,12 +213,35 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @test
+   */
+  function doNotRouteAjaxRequestsToNonAjaxRoutes() {
+    $this->_router->addRoutes(
+      array(
+        '/' => array(
+          'controller' => 'Foo',
+          'action' => 'bar',
+          'requestTypes' => array(Route::GET, Route::POST)
+        )
+      )
+    );
+
+    $requestMock = $this->_getRequestMockWithPathControllerAction('/');
+    $requestMock->expects($this->atLeastOnce())
+                ->method('isXmlHttpRequest')
+                ->will($this->returnValue(true));
+
+    $route = $this->_router->route($requestMock);
+    $this->assertFalse($route);
+  }
+
+  /**
    * Creates a mock object for a \Zurv\Request class instance.
    * @param string $path
    * @param string $controller
    * @param string $action
    */
-  protected function _getRequestMockWithPathControllerAction($path, $controller, $action, $additionalMethods = array(), $requestMethod = 'get') {
+  protected function _getRequestMockWithPathControllerAction($path, $controller = '', $action = '', $additionalMethods = array(), $requestMethod = 'get') {
     $requestMock = $this->getMockForAbstractClass('\Zurv\Request');
 
     $requestMock->expects($this->any())
@@ -227,12 +250,16 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
     $requestMock->expects($this->once())
                 ->method('getPath')
                 ->will($this->returnValue($path));
-    $requestMock->expects($this->once())
-                ->method('setController')
-                ->with($controller);
-    $requestMock->expects($this->once())
-                ->method('setAction')
-                ->with($action);
+    if(! empty($controller)) {
+      $requestMock->expects($this->once())
+                  ->method('setController')
+                  ->with($controller);
+    }
+    if(! empty($action)) {
+      $requestMock->expects($this->once())
+                  ->method('setAction')
+                  ->with($action);
+    }
 
     return $requestMock;
   }
