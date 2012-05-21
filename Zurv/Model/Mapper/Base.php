@@ -9,6 +9,8 @@ use Zurv\Model\Mapper as Mapper;
  * @author mau
  */
 abstract class Base implements Mapper {
+  const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+
   /**
    * @var \PDO
    */
