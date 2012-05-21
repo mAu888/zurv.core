@@ -32,7 +32,15 @@ class Base implements Router {
         unset($options['controller']);
       }
 
-      $this->addRoute($route, $controller, $action, $options);
+      $route = $this->addRoute($route, $controller, $action, $options);
+
+      if(isset($options['isAjax']) && $options['isAjax'] === true) {
+        $route->setRequireXmlHttpRequest(true);
+      }
+
+      if(isset($options['requestTypes']) && is_array($options['requestTypes'])) {
+        call_user_func_array(array($route, 'setRequestTypes'), $options['requestTypes']);
+      }
     }
   }
 

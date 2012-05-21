@@ -190,6 +190,29 @@ class BaseTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @test
+   **/
+  function assignMultipleRoutesByArraySettingAdditionalRequirements() {
+    $this->_router->addRoutes(
+      array(
+        '/foo/bar' => array(
+          'controller' => 'Foo',
+          'action' => 'bar',
+          'isAjax' => true,
+          'requestTypes' => array(Route::GET, Route::POST)
+        )
+      )
+    );
+
+    $requestMock = $this->_getRequestMockWithPathControllerAction('/foo/bar', 'Foo', 'bar');
+    $requestMock->expects($this->atLeastOnce())
+                ->method('isXmlHttpRequest')
+                ->will($this->returnValue(true));
+
+    $route = $this->_router->route($requestMock);
+  }
+
+  /**
    * Creates a mock object for a \Zurv\Request class instance.
    * @param string $path
    * @param string $controller
